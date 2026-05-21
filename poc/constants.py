@@ -1,0 +1,5 @@
+data_loc = "/home/012/b/be/dal144042/fmri_data"
+participants_file = f"{data_loc}/participants_200_list.csv"
+mni_template = f"{data_loc}/mni/MNI152_T1_2mm_brain.nii.gz"
+v85_fmri = f"{data_loc}/perfect_example/sub-NDARINV003RTV85_ses-baselineYear1Arm1_task-sst_run-02LN.feat"
+v85_ln = f"{v85_fmri}/sub-NDARINV003RTV85_filtered_func_data_LN.nii.gz"
