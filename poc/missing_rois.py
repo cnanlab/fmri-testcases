@@ -7,12 +7,13 @@ import pandas as pd
 import sys
 import os
 from multiprocessing import Pool
+import constants as cs
 
-data_loc = "/home/012/b/be/dal144042/fmri_data"
-participants_df = pd.read_csv(f"{data_loc}/participants_200_list.csv")[["subid", "image", "run"]].drop_duplicates()
-mni_template = f"{data_loc}/mni/MNI152_T1_2mm_brain.nii.gz"
-v85_fmri = f"{data_loc}/perfect_example/sub-NDARINV003RTV85_ses-baselineYear1Arm1_task-sst_run-02LN.feat"
-v85_ln = f"{v85_fmri}/sub-NDARINV003RTV85_filtered_func_data_LN.nii.gz"
+data_loc = cs.data_loc
+participants_df = pd.read_csv(cs.participants_file)[["subid", "image", "run"]].drop_duplicates()
+mni_template = cs.mni_template
+v85_fmri = cs.v85_fmri
+v85_ln = cs.v85_ln
 
 def get_binary_region(mat):
     mat = mat
@@ -32,7 +33,7 @@ def get_diff_area(image):
     return area
 
 def verify(area):
-    return int(area < 80000)
+    return int(area < 50000)
 
 def data_path(subid, image, run):
     return f"{data_loc}/sub-{subid}_ses-baselineYear1Arm1_task-sst_{run}LN.feat/stats_roi/sub-{subid}_{image}_{run}_LN.nii.gz"
@@ -75,10 +76,13 @@ def main():
                     print(*result, file = good_scores_file)
                 elif result[-1] == 0:
                     print(*result, file = bad_scores_file)
-    elif len(sys.argv) == 4:
+    elif len(sys.argv) > 3:
         subid = sys.argv[1]
         image = sys.argv[2]
         run = sys.argv[3]
+        plot_name = "plot"
+        if len(sys.argv) > 4:
+            plot_name = sys.argv[4]
         fmri_path = data_path(subid, image, run)
         im = None
         if len(img.load_img(fmri_path).shape) == 4:
@@ -86,6 +90,7 @@ def main():
         else:
             im = img.load_img(fmri_path)
         area = get_diff_area(im)
-        nplt.plot_glass_brain(im, display_mode = "x", title = f"{area}", output_file = "./plot.png")
+        nplt.plot_glass_brain(im, display_mode = "x", title = f"{area}", output_file = f"./{plot_name}.png")
 
-main()
+if __name__ == '__main__':
+    main()
