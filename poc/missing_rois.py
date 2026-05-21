@@ -5,12 +5,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 import sys
+import os
 
-data_loc = "/home/012/b/be/dal144042/fmri_data"
-participants_df = pd.read_csv(f"{data_loc}/participants_200_list.csv")
-mni_template = f"{data_loc}/mni/MNI152_T1_2mm_brain.nii.gz"
-v85_fmri = f"{data_loc}/perfect_example/sub-NDARINV003RTV85_ses-baselineYear1Arm1_task-sst_run-02LN.feat"
-v85_ln = f"{v85_fmri}/sub-NDARINV003RTV85_filtered_func_data_LN.nii.gz"
+#data_loc = "/home/012/b/be/dal144042/fmri_data"
+data_loc = "/mnt/storage/processed_mri/sst/baseline_delete"
+participants_df = pd.read_csv(f"/mnt/storage/failed_roi/participants_200/participants_200_list.csv")
+mni_template = f"/mnt/storage/masks/MNI152_T1_2mm_brain.nii.gz"
+#v85_fmri = f"{data_loc}/perfect_example/sub-NDARINV003RTV85_ses-baselineYear1Arm1_task-sst_run-02LN.feat"
+#v85_ln = f"{v85_fmri}/sub-NDARINV003RTV85_filtered_func_data_LN.nii.gz"
 
 def get_binary_region(mat):
     mat = mat
@@ -41,6 +43,8 @@ def main():
         images = []
         for fmri in fmris:
             fmri_path = data_path(fmri[0], fmri[1], fmri[2])
+            if(not os.path.exists(fmri_path)):
+                continue
             if len(img.load_img(fmri_path).shape) == 4:
                 images.append(img.load_img(img.index_img(fmri_path, 0)))
             else:
