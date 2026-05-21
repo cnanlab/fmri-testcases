@@ -53,8 +53,9 @@ def get_result(fmri):
 def main():
     if len(sys.argv) == 1:
         fmris = list(participants_df.itertuples(index = False, name = None))
-        pool = Pool()
-        results = pool.map(get_result, fmris)
+        results = []
+        with Pool() as pool:
+            results = pool.map(get_result, fmris)
         num_passed = 0
         total = 0
         for result in results:
@@ -62,10 +63,18 @@ def main():
             if passed != -1:
                 num_passed += passed
                 total += 1
-        with open("./scores.txt", "w", encoding = "utf-8") as file:
-            print("subid", "image", "run", "score", "passed", f"({num_passed}/{total})", file = file)
+        with open("./good_scores.txt", "w", encoding = "utf-8") as good_scores_file, \
+            open("./bad_scores.txt", "w", encoding = "utf-8") as bad_scores_file, \
+            open("./scores.txt", "w", encoding = "utf-8") as scores_file:
+            print("subid", "image", "run", "score", "passed", f"({num_passed}/{total})", file = good_scores_file)
+            print("subid", "image", "run", "score", "passed", f"({num_passed}/{total})", file = bad_scores_file)
+            print("subid", "image", "run", "score", "passed", f"({num_passed}/{total})", file = scores_file)
             for result in results:
-                print(*result, file = file)
+                print(*result, file = scores_file)
+                if result[-1] == 1:
+                    print(*result, file = good_scores_file)
+                elif result[-1] == 0:
+                    print(*result, file = bad_scores_file)
     elif len(sys.argv) == 4:
         subid = sys.argv[1]
         image = sys.argv[2]
