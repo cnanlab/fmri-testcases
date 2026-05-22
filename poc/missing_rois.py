@@ -86,7 +86,7 @@ def main():
         fmri_path = data_path(subid, image, run)
         im = None
         if len(img.load_img(fmri_path).shape) == 4:
-            im = img.load_img(img.index_img(fmri_path, 0))
+            im = img.load_img(img.mean_img(fmri_path))
         else:
             im = img.load_img(fmri_path)
         area = get_diff_area(im)
