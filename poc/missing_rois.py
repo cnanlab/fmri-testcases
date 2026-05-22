@@ -41,12 +41,14 @@ def data_path(subid, image, run):
 def get_result(fmri):
     fmri_path = data_path(fmri[0], fmri[1], fmri[2])
     if os.path.exists(fmri_path):
-        image = None
+        area = 0
         if len(img.load_img(fmri_path).shape) == 4:
-            image = img.load_img(img.index_img(fmri_path, 0))
+            for image in img.iter_img(fmri_path):
+                area += get_diff_area(image)
+            area /= img.load_img(fmri_path).shape[3]
         else:
             image = img.load_img(fmri_path)
-        area = get_diff_area(image)
+            area = get_diff_area(image)
         passed = verify(area)
         return (*fmri, area, passed)
     return (*fmri, -1, -1)
