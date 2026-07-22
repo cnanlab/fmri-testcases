@@ -10,10 +10,12 @@ from multiprocessing import Pool
 import constants as cs
 
 data_loc = cs.data_loc
-participants_df = pd.read_csv(cs.participants_file)[["subid", "image", "run"]].drop_duplicates()
+#participants_df = pd.read_csv(cs.participants_file)[["subid", "image", "run"]].drop_duplicates()
+participants_df = pd.read_csv(cs.participants_file)
+participants_df = participants_df.assign(subid=lambda df:df.part_id, run=lambda df:df.run_full_name, image=lambda df:[["zfstat1", "zfstat2", "zfstat3", "zfstat4", "zfstat5", "zfstat6"]]*len(df)).explode("image").loc[:, ["subid", "image", "run"]]
 mni_template = cs.mni_template
-v85_fmri = cs.v85_fmri
-v85_ln = cs.v85_ln
+#v85_fmri = cs.v85_fmri
+#v85_ln = cs.v85_ln
 
 def get_binary_region(mat):
     mat = mat
@@ -36,7 +38,7 @@ def verify(area):
     return int(area < 50000)
 
 def data_path(subid, image, run):
-    return f"{data_loc}/sub-{subid}_ses-baselineYear1Arm1_task-sst_{run}LN.feat/stats_roi/sub-{subid}_{image}_{run}_LN.nii.gz"
+    return f"{data_loc}/sub-{subid}_ses-baselineYear1Arm1_task-sst_{run}.feat/stats_roi/sub-{subid}_{image}_{run.replace("LN", "_LN")}.nii.gz"
 
 def get_result(fmri):
     fmri_path = data_path(fmri[0], fmri[1], fmri[2])
